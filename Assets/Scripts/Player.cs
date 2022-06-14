@@ -60,10 +60,14 @@ public class Player : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
 
         userInterface = GameObject.FindWithTag("UI");
-        dialogue = GameObject.FindWithTag("Dialogue");
-        dialogue.SetActive(false);
+        if(SceneManager.GetActiveScene().name == "Level1")
+        {
+            dialogue = GameObject.FindWithTag("Dialogue");
+            dialogue.SetActive(false);
+        }
 
         lives[0] = userInterface.transform.GetChild(0).gameObject;
+        Debug.Log("AICI APAR INIMIOARE MAICA.");
         lives[1] = userInterface.transform.GetChild(1).gameObject;
         lives[2] = userInterface.transform.GetChild(2).gameObject;
 
@@ -90,6 +94,7 @@ public class Player : MonoBehaviour
         if (!gotLevel) {
             GetLevel();
         }
+        if(time < 0.5f) time += Time.deltaTime;
     }
 
     public void GetLevel()
@@ -239,32 +244,8 @@ public class Player : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag(TRAP_TAG))
-        {
-            time += Time.deltaTime;
-            if (time >= 0.5f)
-            {
-                 Hit();
-                 time = 0f;
-            }
-            if (noLives == 0)
-            {
-                Die();
-            }
-        }
-        if (collision.gameObject.CompareTag(MONSTER_TAG))
-        {
-            time += Time.deltaTime;
-            if (time >= 0.5f)
-            {
-                Hit();
-                time = 0f;
-            }
-            if (noLives == 0)
-            {
-                Die();
-            }
-        }
+        if (collision.gameObject.CompareTag(TRAP_TAG) || collision.gameObject.CompareTag(MONSTER_TAG))
+            Hit();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -323,11 +304,23 @@ public class Player : MonoBehaviour
         anim.SetTrigger("death");
     }
 
-    private void Hit()
+    public void Hit()
     {
-        anim.SetTrigger("hit");
-        Destroy(lives[noLives - 1]);
-        noLives--;
+        
+            time += Time.deltaTime;
+            if (time >= 0.5f)
+            {
+                anim.SetTrigger("hit");
+                Destroy(lives[noLives - 1]);
+                noLives--;
+                time = 0f;
+            }
+            if (noLives == 0)
+            {
+                Die();
+            }
+        
+
     }
 
     private void RestartLevel()
@@ -338,5 +331,19 @@ public class Player : MonoBehaviour
     public bool CanAttack()
     {
         return Mathf.Abs(rb.velocity.y) < 0.1f && SceneManager.GetActiveScene().name == "Level2v1";
+    }
+
+    public int getLives()
+    {
+        return noLives;
+    }
+    public void setLives(int no)
+    {
+        if(no <= -1)
+        {
+            noLives = 0;
+            return;
+        }
+        noLives = no;
     }
 }
