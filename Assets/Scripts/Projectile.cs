@@ -9,13 +9,13 @@ public class Projectile : MonoBehaviour
     private float speed = 12;
     private string MONSTER_TAG = "Monster";
 
-    private Transform player;
+    //private Transform player;
 
     public float dir;
 
     void Start()
     {
-        player = GameObject.FindWithTag("Player").transform;
+        //player = GameObject.FindWithTag("Player").transform;
         rb = GetComponent<Rigidbody2D>();
     }
 

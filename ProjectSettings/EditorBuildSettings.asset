@@ -24,8 +24,17 @@ EditorBuildSettings:
     path: Assets/Scenes/Level2v2.unity
     guid: 137ace70054917c49915e027b67d16a2
   - enabled: 1
+    path: Assets/Scenes/Level2v3.unity
+    guid: 851437594c253704a8f035622015ff23
+  - enabled: 1
     path: Assets/Scenes/StartMenu2.unity
     guid: 839f434834b6fe8448ae9f8efcf419db
+  - enabled: 1
+    path: Assets/Scenes/BadEndingScreen.unity
+    guid: 8e70368d47a013a4c9af4f3081478b80
+  - enabled: 1
+    path: Assets/Scenes/GoodEndingScreen.unity
+    guid: 3c8f7e536e675fa45ab5e5eb7ec89997
   - enabled: 1
     path: Assets/Scenes/EndScreen.unity
     guid: f32e865c690ab8649b7a129b20c08ce4

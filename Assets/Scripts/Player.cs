@@ -21,11 +21,14 @@ public class Player : MonoBehaviour
     private string ENDGAME_TAG = "EndGame";
     private string LEVEL2_TAG = "Level2";
     private string GILTAZEL_TAG = "Giltazel";
+    private string LIFE_TAG = "LifeRefill";
+    private string IMUNITY_TAG = "Imunity";
 
     [SerializeField] private GameObject[] lives; //vector containing UI heart images
     private int noLives = 3; //the player has 3 lives by default
 
     private float time = 0f;
+    private float imunityTime = 0f;
 
     private bool canDoubleJump = false;
 
@@ -49,6 +52,7 @@ public class Player : MonoBehaviour
     bool gotLevel = false;
 
     GameObject dialogue;
+    private bool imunity = false;
     //public int charIndex;
 
     // Start is called before the first frame update
@@ -67,7 +71,6 @@ public class Player : MonoBehaviour
         }
 
         lives[0] = userInterface.transform.GetChild(0).gameObject;
-        Debug.Log("AICI APAR INIMIOARE MAICA.");
         lives[1] = userInterface.transform.GetChild(1).gameObject;
         lives[2] = userInterface.transform.GetChild(2).gameObject;
 
@@ -95,6 +98,8 @@ public class Player : MonoBehaviour
             GetLevel();
         }
         if(time < 0.5f) time += Time.deltaTime;
+
+        UpdateImunity();
     }
 
     public void GetLevel()
@@ -245,7 +250,7 @@ public class Player : MonoBehaviour
     private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag(TRAP_TAG) || collision.gameObject.CompareTag(MONSTER_TAG))
-            Hit();
+            HitWithTimer();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -255,14 +260,40 @@ public class Player : MonoBehaviour
             Destroy(collision.gameObject);
             canDoubleJump = true;
         }
+        if (collision.gameObject.CompareTag(LIFE_TAG))
+        {
+            Destroy(collision.gameObject);
+            AddHealth();
+        }
+        if (collision.gameObject.CompareTag(IMUNITY_TAG))
+        {
+            Destroy(collision.gameObject);
+            StartImunity();
+        }
         if (collision.gameObject.CompareTag(ENDGAME_TAG))
         {
-            SceneManager.LoadScene("EndScreen");
+            myPages = GetComponent<ItemCollector>().pages;
+            if (SceneManager.GetActiveScene().name == "Level2v1")
+                SceneManager.LoadScene("BadEndingScreen");
+            else if (SceneManager.GetActiveScene().name == "Level2v2")
+                SceneManager.LoadScene("GoodEndingScreen");
+            else if (SceneManager.GetActiveScene().name == "Level2v3")
+            {
+                if (myPages >= 12)
+                {
+                    SceneManager.LoadScene("GoodEndingScreen");
+                }
+                else
+                {
+                    SceneManager.LoadScene("BadEndingScreen");
+                }
+            }
+            /*SceneManager.LoadScene("EndScreen");
             string path = Application.persistentDataPath + "/player.save";
             if (File.Exists(path))
             {
                 File.Delete(path);
-            }
+            }*/
         }
         if (collision.gameObject.CompareTag("DialogueGiltazel"))
         {
@@ -279,13 +310,17 @@ public class Player : MonoBehaviour
         }
         if (collision.gameObject.CompareTag(LEVEL2_TAG) && spoke)
         {
-            if(option)
+            if (option)
             {
                 SceneManager.LoadScene("Level2v1");
             }
-            else
+            else if (!option && myPages > (totalNoOfPages - myPages))
             {
                 SceneManager.LoadScene("Level2v2");
+            }
+            else
+            {
+                SceneManager.LoadScene("Level2v3");
             }
         }
     }
@@ -306,12 +341,28 @@ public class Player : MonoBehaviour
 
     public void Hit()
     {
-        
+        if (!imunity)
+        {
+            anim.SetTrigger("hit");
+            lives[noLives - 1].SetActive(false);
+            noLives--;
+            time = 0;
+            if (noLives == 0)
+            {
+                Die();
+            }
+        }
+    }
+
+    public void HitWithTimer()
+    {
+        if (!imunity)
+        {
             time += Time.deltaTime;
-            if (time >= 0.5f)
+            if (time >= 0.8f)
             {
                 anim.SetTrigger("hit");
-                Destroy(lives[noLives - 1]);
+                lives[noLives - 1].SetActive(false);
                 noLives--;
                 time = 0f;
             }
@@ -319,8 +370,7 @@ public class Player : MonoBehaviour
             {
                 Die();
             }
-        
-
+        }
     }
 
     private void RestartLevel()
@@ -345,5 +395,31 @@ public class Player : MonoBehaviour
             return;
         }
         noLives = no;
+    }
+    public void AddHealth()
+    {
+        lives[noLives].SetActive(true);
+        if(noLives < 3)
+            noLives++;
+    }
+
+    public void StartImunity()
+    {
+        imunity = true;
+        imunityTime = 0;
+        sprite.color = Color.green;
+    }
+
+    private void UpdateImunity()
+    {
+        if (imunity)
+        {
+            imunityTime += Time.deltaTime;
+            if (imunityTime >= 15)
+            {
+                imunity = false;
+                sprite.color = Color.white;
+            }
+        }
     }
 }

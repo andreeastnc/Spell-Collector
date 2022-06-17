@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
 
     void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
     {
-        if (scene.name == "Level1" || scene.name == "Level2v1" || scene.name == "Level2v2")
+        if (scene.name == "Level1" || scene.name == "Level2v1" || scene.name == "Level2v2" || scene.name == "Level2v3")
         {
             Instantiate(characters[CharIndex]);
         }

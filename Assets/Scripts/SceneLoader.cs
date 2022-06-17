@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 public class SceneLoader : MonoBehaviour
 {
@@ -35,5 +36,15 @@ public class SceneLoader : MonoBehaviour
     public void RestartLevel()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void EndScreen()
+    {
+        SceneManager.LoadScene("EndScreen");
+        string path = Application.persistentDataPath + "/player.save";
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
     }
 }

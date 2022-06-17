@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 3233169057729350523}
   - component: {fileID: 3233169057729350521}
   - component: {fileID: -2923296565784458098}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player_2
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -712822037
-  m_SortingLayer: 5
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_Sprite: {fileID: -6367560908665664636, guid: 3750f45c844123341b9a777a96cb1eca, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -175,6 +175,7 @@ MonoBehaviour:
   - {fileID: 0}
   projectile: {fileID: 2398745893320875586, guid: 3a6cd3e128d2e564fa7fd298066cd0ab, type: 3}
   firePoint: {fileID: 0}
+  level: 1
 --- !u!114 &3233169057729350521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -339,6 +340,10 @@ PrefabInstance:
     - target: {fileID: 7785152123056149807, guid: be5ea19cf9623ef458e975991ff2e8ad, type: 3}
       propertyPath: m_Name
       value: Fire Point
+      objectReference: {fileID: 0}
+    - target: {fileID: 7785152123056149807, guid: be5ea19cf9623ef458e975991ff2e8ad, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be5ea19cf9623ef458e975991ff2e8ad, type: 3}

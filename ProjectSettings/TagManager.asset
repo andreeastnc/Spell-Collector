@@ -18,6 +18,8 @@ TagManager:
   - Dialogue
   - Book
   - Cutscene
+  - LifeRefill
+  - Imunity
   layers:
   - Default
   - TransparentFX
