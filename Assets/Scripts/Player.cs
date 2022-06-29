@@ -34,8 +34,8 @@ public class Player : MonoBehaviour
 
     public static bool option = false;
     private bool spoke = false;
-    private int totalNoOfPages = 13;
-    private int myPages = 0;
+    public int totalNoOfPages = 16;
+    public int myPages = 0;
     private int jumps = 0;
 
     public Projectile projectile;
@@ -46,28 +46,40 @@ public class Player : MonoBehaviour
 
     private GameObject userInterface;
 
-    AudioSource audioSource;
+    [SerializeField] AudioSource walkSound;
+    [SerializeField] AudioSource jumpSound;
+    [SerializeField] AudioSource attackSound;
+    [SerializeField] AudioSource hitSound;
+    [SerializeField] AudioSource dieSound;
+    [SerializeField] AudioSource collectSound;
 
     public int level = 1;
     bool gotLevel = false;
 
     GameObject dialogue;
+    GameObject dialogue2;
     private bool imunity = false;
     //public int charIndex;
 
+    public bool froze = false;
+
+    public int charIndex; 
+    [SerializeField] private Text pagesText;
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
-        audioSource = GetComponent<AudioSource>();
+        //audioSource = GetComponent<AudioSource>();
 
         userInterface = GameObject.FindWithTag("UI");
         if(SceneManager.GetActiveScene().name == "Level1")
         {
             dialogue = GameObject.FindWithTag("Dialogue");
             dialogue.SetActive(false);
+            dialogue2 = GameObject.FindWithTag("Dialogue2");
+            dialogue2.SetActive(false);
         }
 
         lives[0] = userInterface.transform.GetChild(0).gameObject;
@@ -79,27 +91,32 @@ public class Player : MonoBehaviour
         /*GameManager game = new GameManager();
         charIndex = game.CharIndex;
         Debug.Log(charIndex);*/
+        charIndex = GameManager.instance.CharIndex;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Movement();
-        AnimationState();
-        PlayerJump();
+        if (!froze)
+        {
+            Movement();
+            AnimationState();
+            PlayerJump();
 
-        if(canDoubleJump)
-            MaxJumps();
+            if (canDoubleJump)
+                MaxJumps();
 
-        Attack();
-        cooldownTimer += Time.deltaTime;
+            Attack();
+            cooldownTimer += Time.deltaTime;
 
-        if (!gotLevel) {
-            GetLevel();
+            if (!gotLevel)
+            {
+                GetLevel();
+            }
+            if (time < 0.5f) time += Time.deltaTime;
+
+            UpdateImunity();
         }
-        if(time < 0.5f) time += Time.deltaTime;
-
-        UpdateImunity();
     }
 
     public void GetLevel()
@@ -116,10 +133,16 @@ public class Player : MonoBehaviour
             gotLevel = true;
             SaveSystem.SavePlayer(this);
         }
-        else if (SceneManager.GetActiveScene().name == "Level2v2")
+        if (SceneManager.GetActiveScene().name == "Level2v2")
         {
             level = 3;
             gotLevel= true;
+            SaveSystem.SavePlayer(this);
+        }
+        else if (SceneManager.GetActiveScene().name == "Level2v3")
+        {
+            level = 4;
+            gotLevel = true;
             SaveSystem.SavePlayer(this);
         }
     }
@@ -138,9 +161,13 @@ public class Player : MonoBehaviour
         {
             SceneManager.LoadScene("Level2v1");
         }
-        else if (level == 3)
+        if (level == 3)
         {
             SceneManager.LoadScene("Level2v2");
+        }
+        else if (level == 4)
+        {
+            SceneManager.LoadScene("Level2v3");
         }
     }
 
@@ -148,14 +175,14 @@ public class Player : MonoBehaviour
     {
         dirX = Input.GetAxisRaw("Horizontal");
         rb.velocity = new Vector2(dirX * speed, rb.velocity.y);
-        if(rb.velocity.x != 0)
+        if(rb.velocity.x != 0 && rb.velocity.y < 0.1)
         {
-            if(!audioSource.isPlaying)
-                audioSource.Play();
+            if(!walkSound.isPlaying)
+                walkSound.Play();
         }
         else
         {
-            audioSource.Stop();
+            walkSound.Stop();
         }
     }
 
@@ -175,6 +202,7 @@ public class Player : MonoBehaviour
                 if(Mathf.Abs(rb.velocity.y) < 0.1f) 
                 {
                     rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                    jumpSound.Play();
                 }
             }
             if (canDoubleJump)
@@ -183,6 +211,7 @@ public class Player : MonoBehaviour
                 {
                     rb.velocity = new Vector2(rb.velocity.x, jumpForce + 1);
                     jumps--;
+                    jumpSound.Play();
                 }
                 if(jumps == 0)
                 {
@@ -199,6 +228,7 @@ public class Player : MonoBehaviour
             GameObject projObj = Instantiate(projectile.gameObject, firePoint.transform.position, transform.rotation);
             projObj.GetComponent<Projectile>().dir = transform.localScale.x;
             cooldownTimer = 0;
+            attackSound.Play();
         }
     }
 
@@ -259,29 +289,32 @@ public class Player : MonoBehaviour
         {
             Destroy(collision.gameObject);
             canDoubleJump = true;
+            collectSound.Play();
         }
         if (collision.gameObject.CompareTag(LIFE_TAG))
         {
             Destroy(collision.gameObject);
             AddHealth();
+            collectSound.Play();
         }
         if (collision.gameObject.CompareTag(IMUNITY_TAG))
         {
             Destroy(collision.gameObject);
             StartImunity();
+            collectSound.Play();
         }
         if (collision.gameObject.CompareTag(ENDGAME_TAG))
         {
-            myPages = GetComponent<ItemCollector>().pages;
             if (SceneManager.GetActiveScene().name == "Level2v1")
                 SceneManager.LoadScene("BadEndingScreen");
             else if (SceneManager.GetActiveScene().name == "Level2v2")
                 SceneManager.LoadScene("GoodEndingScreen");
             else if (SceneManager.GetActiveScene().name == "Level2v3")
             {
+                myPages = GetComponent<ItemCollector>().pages;
                 if (myPages >= 12)
                 {
-                    SceneManager.LoadScene("GoodEndingScreen");
+                     SceneManager.LoadScene("GoodEndingScreen");
                 }
                 else
                 {
@@ -305,6 +338,7 @@ public class Player : MonoBehaviour
             }
             else
             {
+                dialogue2.SetActive(true);
                 option = false;
             }
         }
@@ -330,6 +364,7 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("DialogueGiltazel"))
         {
             dialogue.SetActive(false);
+            dialogue2.SetActive(false);
         }
     }
 
@@ -337,6 +372,7 @@ public class Player : MonoBehaviour
     {
         rb.bodyType = RigidbodyType2D.Static;
         anim.SetTrigger("death");
+        dieSound.Play();
     }
 
     public void Hit()
@@ -347,6 +383,7 @@ public class Player : MonoBehaviour
             lives[noLives - 1].SetActive(false);
             noLives--;
             time = 0;
+            hitSound.Play();
             if (noLives == 0)
             {
                 Die();
@@ -365,6 +402,7 @@ public class Player : MonoBehaviour
                 lives[noLives - 1].SetActive(false);
                 noLives--;
                 time = 0f;
+                hitSound.Play();
             }
             if (noLives == 0)
             {

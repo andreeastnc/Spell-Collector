@@ -20,6 +20,7 @@ TagManager:
   - Cutscene
   - LifeRefill
   - Imunity
+  - Dialogue2
   layers:
   - Default
   - TransparentFX

@@ -9,6 +9,11 @@ public class SceneLoader : MonoBehaviour
     public void NewGame()
     {
         SceneManager.LoadScene("CharacterSelection");
+        string path = Application.persistentDataPath + "/player.save";
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
     }
 
     public void QuitGame()
@@ -28,9 +33,9 @@ public class SceneLoader : MonoBehaviour
 
     public void StartGame()
     {
-        int selectedCharacter = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
-        GameManager.instance.CharIndex = selectedCharacter;
-        SceneManager.LoadScene("Level1");
+         int selectedCharacter = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
+         GameManager.instance.CharIndex = selectedCharacter;
+         SceneManager.LoadScene("Level1");
     }
 
     public void RestartLevel()

@@ -9,13 +9,18 @@ public class PlayerFollower : MonoBehaviour
     private Vector3 targetPosition;
     private float jumpForce = 14.5f;
     private float speed = 6.5f;
-    
+
+    private Animator anim;
+
+    private bool hit = false;
+
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindWithTag("Player").transform;
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -23,6 +28,10 @@ public class PlayerFollower : MonoBehaviour
     {
         targetPosition = new Vector3(player.position.x, rb.position.y, 0);
         rb.position = Vector2.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+        if(!hit)
+            anim.SetBool("running", true);
+        if (hit)
+            anim.SetBool("running", false);
     }
 
     private void Jump()
@@ -34,5 +43,7 @@ public class PlayerFollower : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ground"))
             Jump();
+        if (collision.gameObject.CompareTag("Player"))
+            hit = true;
     }
 }

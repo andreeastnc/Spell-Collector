@@ -11,6 +11,6 @@ public class PlayerData
     public PlayerData (Player player)
     {
         level = player.level;
-        //charIndex = player.charIndex;
+        charIndex = player.charIndex;
     }
 }
