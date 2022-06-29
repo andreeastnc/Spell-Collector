@@ -38,4 +38,14 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 0f;
         isGamePaused = true;
     }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnLevelFinishedLoading;
+    }
+
+    void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
+    {
+        pauseMenu.SetActive(false);
+    }
 }

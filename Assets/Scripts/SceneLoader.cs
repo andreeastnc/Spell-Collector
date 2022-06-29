@@ -6,6 +6,11 @@ using System.IO;
 
 public class SceneLoader : MonoBehaviour
 {
+    private void Start()
+    {
+        Time.timeScale = 1f;
+    }
+
     public void NewGame()
     {
         SceneManager.LoadScene("CharacterSelection");
